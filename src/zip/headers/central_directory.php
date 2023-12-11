@@ -97,7 +97,7 @@ class ezcArchiveCentralDirectoryHeader extends ezcArchiveLocalFileHeader
     /**
      * Defines the signature of this header.
      */
-    const magic = 0x02014b50;
+    final public const magic = 0x02014b50;
 
     /**
      * Creates and initializes a new header.
@@ -203,31 +203,10 @@ class ezcArchiveCentralDirectoryHeader extends ezcArchiveLocalFileHeader
      */
     public function __get( $name )
     {
-        switch ( $name )
-        {
-            case "versionMadeBy":
-            case "versionNeededToExtract":
-            case "bitFlag":
-            case "compressionMethod":
-            case "lastModFileTime":
-            case "lastModFileDate":
-            case "crc":
-            case "compressedSize":
-            case "uncompressedSize":
-            case "diskNumberStart":
-            case "internalFileAttributes":
-            case "externalFileAttributes":
-            case "relativeHeaderOffset":
-            case "fileNameLength":
-            case "extraFieldLength":
-            case "fileCommentLength":
-            case "fileName":
-            case "comment":
-                return $this->properties[$name];
-
-            default:
-                throw new ezcBasePropertyNotFoundException( $name );
-        }
+        return match ($name) {
+            "versionMadeBy", "versionNeededToExtract", "bitFlag", "compressionMethod", "lastModFileTime", "lastModFileDate", "crc", "compressedSize", "uncompressedSize", "diskNumberStart", "internalFileAttributes", "externalFileAttributes", "relativeHeaderOffset", "fileNameLength", "extraFieldLength", "fileCommentLength", "fileName", "comment" => $this->properties[$name],
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -257,35 +236,15 @@ class ezcArchiveCentralDirectoryHeader extends ezcArchiveLocalFileHeader
     public function setType( $type )
     {
         $ext = 0;
-        switch ( $type )
-        {
-            case ezcArchiveEntry::IS_FIFO:
-                $ext = ezcArchiveStatMode::S_IFIFO;
-                break;
-
-            case ezcArchiveEntry::IS_CHARACTER_DEVICE:
-                $ext = ezcArchiveStatMode::S_IFCHR;
-                break;
-
-            case ezcArchiveEntry::IS_DIRECTORY:
-                $ext = ezcArchiveStatMode::S_IFDIR;
-                break;
-
-            case ezcArchiveEntry::IS_BLOCK_DEVICE:
-                $ext = ezcArchiveStatMode::S_IFBLK;
-                break;
-
-            case ezcArchiveEntry::IS_FILE:
-                $ext = ezcArchiveStatMode::S_IFREG;
-                break;
-
-            case ezcArchiveEntry::IS_SYMBOLIC_LINK:
-                $ext = ezcArchiveStatMode::S_IFLNK;
-                break;
-
-            default:
-                throw new ezcArchiveException( "Unknown type" );
-        }
+        $ext = match ($type) {
+            ezcArchiveEntry::IS_FIFO => ezcArchiveStatMode::S_IFIFO,
+            ezcArchiveEntry::IS_CHARACTER_DEVICE => ezcArchiveStatMode::S_IFCHR,
+            ezcArchiveEntry::IS_DIRECTORY => ezcArchiveStatMode::S_IFDIR,
+            ezcArchiveEntry::IS_BLOCK_DEVICE => ezcArchiveStatMode::S_IFBLK,
+            ezcArchiveEntry::IS_FILE => ezcArchiveStatMode::S_IFREG,
+            ezcArchiveEntry::IS_SYMBOLIC_LINK => ezcArchiveStatMode::S_IFLNK,
+            default => throw new ezcArchiveException( "Unknown type" ),
+        };
 
         if ( !isset( $this->properties["externalFileAttributes"] ) )
         {
@@ -331,7 +290,7 @@ class ezcArchiveCentralDirectoryHeader extends ezcArchiveLocalFileHeader
                 return ezcArchiveEntry::IS_SYMBOLIC_LINK;
 
             default:
-                if ( substr( $this->properties["fileName"], -1 ) == "/" )
+                if ( str_ends_with((string) $this->properties["fileName"], "/") )
                 {
                     return ezcArchiveEntry::IS_DIRECTORY;
                 }
@@ -430,7 +389,6 @@ class ezcArchiveCentralDirectoryHeader extends ezcArchiveLocalFileHeader
      * lastModFileTime, lastModFileDate, crc, compressedSize, uncompressedSize, fileNameLength,
      * and fileName.
      *
-     * @param ezcArchiveLocalFileHeader $localFileHeader
      * @return void
      */
     public function setHeaderFromLocalFileHeader( ezcArchiveLocalFileHeader $localFileHeader )

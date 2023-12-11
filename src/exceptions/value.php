@@ -44,7 +44,7 @@ class ezcArchiveValueException extends ezcArchiveException
     public function __construct( $value, $expectedValue = null )
     {
         $type = gettype( $value );
-        if ( in_array( $type, array( 'array', 'object', 'resource' ) ) )
+        if ( in_array( $type, ['array', 'object', 'resource'] ) )
         {
             $value = serialize( $value );
         }

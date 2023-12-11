@@ -74,34 +74,34 @@ class ezcArchiveV7Header
     /**
      * Relative byte position that the header starts.
      */
-    const START_HEADER    = 0;
+    public const START_HEADER    = 0;
 
     /**
      * Relative byte position that the checksum starts.
      */
-    const CHECKSUM_OFFSET = 148;
+    public const CHECKSUM_OFFSET = 148;
 
     /**
      * Number of bytes that the checksum occupies.
      */
-    const CHECKSUM_SIZE   = 8;
+    public const CHECKSUM_SIZE   = 8;
 
     /**
      * Relative byte position that the checksum ends.
      */
-    const END_HEADER      = 512;
+    public const END_HEADER      = 512;
 
     /**
      * Number of bytes that a block occupies.
      */
-    const BLOCK_SIZE      = 512;
+    public const BLOCK_SIZE      = 512;
 
     /**
      * Holds the properties of this class.
      *
      * @var array(string=>mixed)
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Sets the property $name to $value.
@@ -114,23 +114,10 @@ class ezcArchiveV7Header
      */
     public function __set( $name, $value )
     {
-        switch ( $name )
-        {
-            case "fileName":
-            case "fileMode":
-            case "userId":
-            case "groupId":
-            case "fileSize":
-            case "modificationTime":
-            case "checksum":
-            case "type":
-            case "linkName":
-                $this->properties[$name] = $value;
-                break;
-
-            default:
-                throw new ezcBasePropertyNotFoundException( $name );
-        }
+        $this->properties[$name] = match ($name) {
+            "fileName", "fileMode", "userId", "groupId", "fileSize", "modificationTime", "checksum", "type", "linkName" => $value,
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -143,22 +130,10 @@ class ezcArchiveV7Header
      */
     public function __get( $name )
     {
-        switch ( $name )
-        {
-            case "fileName":
-            case "fileMode":
-            case "userId":
-            case "groupId":
-            case "fileSize":
-            case "modificationTime":
-            case "checksum":
-            case "type":
-            case "linkName":
-                return $this->properties[ $name ];
-
-            default:
-                throw new ezcBasePropertyNotFoundException( $name );
-        }
+        return match ($name) {
+            "fileName", "fileMode", "userId", "groupId", "fileSize", "modificationTime", "checksum", "type", "linkName" => $this->properties[ $name ],
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -204,11 +179,11 @@ class ezcArchiveV7Header
                                         "{$formatCode}1type/".
                                         "{$formatCode}100linkName", $file->current() );
 
-            $this->properties["userId"]   = octdec( $this->properties["userId"] );
-            $this->properties["groupId"]  = octdec( $this->properties["groupId"] );
-            $this->properties["fileSize"]  = octdec( $this->properties["fileSize"] );
-            $this->properties["modificationTime"]  = octdec( $this->properties["modificationTime"] );
-            $this->properties["checksum"]  = octdec( $this->properties["checksum"] );
+            $this->properties["userId"]   = octdec( (string) $this->properties["userId"] );
+            $this->properties["groupId"]  = octdec( (string) $this->properties["groupId"] );
+            $this->properties["fileSize"]  = octdec( (string) $this->properties["fileSize"] );
+            $this->properties["modificationTime"]  = octdec( (string) $this->properties["modificationTime"] );
+            $this->properties["checksum"]  = octdec( (string) $this->properties["checksum"] );
 
             if ( !$this->checksum( $this->checksum, $file->current() ) )
             {
@@ -279,29 +254,13 @@ class ezcArchiveV7Header
         $this->modificationTime = $entry->getModificationTime();
         $this->linkName = $entry->getLink( false );
 
-        switch ( $entry->getType() )
-        {
-            case ezcArchiveEntry::IS_FILE:
-                $this->type = "";
-                break; // ends up as a \0 character.
-
-            case ezcArchiveEntry::IS_LINK:
-                $this->type = 1;
-                break;
-
-            case ezcArchiveEntry::IS_SYMBOLIC_LINK:
-                $this->type = 2;
-                break;
-
-            case ezcArchiveEntry::IS_DIRECTORY:
-                $this->type = 5;
-                break;
-
-            // Devices, etc are set to \0.
-            default:
-                $this->type = "";
-                break; // ends up as a \0 character.
-        }
+        $this->type = match ($entry->getType()) {
+            ezcArchiveEntry::IS_FILE => "",
+            ezcArchiveEntry::IS_LINK => 1,
+            ezcArchiveEntry::IS_SYMBOLIC_LINK => 2,
+            ezcArchiveEntry::IS_DIRECTORY => 5,
+            default => "",
+        };
 
         $length = strlen( $this->fileName );
 
@@ -317,7 +276,7 @@ class ezcArchiveV7Header
         {
            if ( $this->fileName[ $length - 1] == "/" )
            {
-               $this->fileName = substr( $header->fileName, 0, -1 ); // Remove last character.
+               $this->fileName = substr( (string) $header->fileName, 0, -1 ); // Remove last character.
            }
         }
     }
@@ -350,7 +309,7 @@ class ezcArchiveV7Header
 
         $enc = pack( "a100a8a8a8a12a12a8a1a100a72a8a8a167",
             $this->fileName,
-            str_pad( $this->fileMode, 7, "0", STR_PAD_LEFT ),
+            str_pad( (string) $this->fileMode, 7, "0", STR_PAD_LEFT ),
             str_pad( decoct( $this->userId ), 7, "0", STR_PAD_LEFT ),
             str_pad( decoct( $this->groupId ), 7, "0", STR_PAD_LEFT ),
             str_pad( decoct( $this->fileSize ), 11, "0", STR_PAD_LEFT ),
@@ -400,7 +359,7 @@ class ezcArchiveV7Header
         }
 
         // trailing slash means directory
-        if ( $this->fileName[ strlen( $this->fileName ) - 1 ] == '/' )
+        if ( $this->fileName[ strlen( (string) $this->fileName ) - 1 ] == '/' )
         {
             $struct->type = ezcArchiveEntry::IS_DIRECTORY;
         }

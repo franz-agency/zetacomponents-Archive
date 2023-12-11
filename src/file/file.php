@@ -40,26 +40,26 @@ abstract class ezcArchiveFile implements Iterator
      * The file permissions can be set to read-only or file is compressed with a
      * stream that can only be read. E.g. bzip2.
      */
-    const READ_ONLY   = 1;
+    public const READ_ONLY   = 1;
 
     /**
      * The file is write-only.
      * The file permissions can be set to write-only or file should be compressed with a
      * stream that can only write. E.g. bzip2.
      */
-    const WRITE_ONLY  = 2;
+    public const WRITE_ONLY  = 2;
 
     /**
      * The file is either read or append mode.
      * Some compressed streams (zlib) do not support reading and writing. But seperate reading
      * and appending does work.
      */
-    const READ_APPEND = 3;
+    public const READ_APPEND = 3;
 
     /**
      * The file is opened in a read and write mode.
      */
-    const READ_WRITE  = 4;
+    public const READ_WRITE  = 4;
 
     /**
      * The mode the file is opened in. It has one of the following constant values:
@@ -109,12 +109,12 @@ abstract class ezcArchiveFile implements Iterator
     /**
      * Read-mode for the archive file.
      */
-    const SWITCH_READ = 0;
+    public const SWITCH_READ = 0;
 
     /**
      * Append-mode for the archive file.
      */
-    const SWITCH_APPEND = 1;
+    public const SWITCH_APPEND = 1;
 
     /**
      * Switch for read-mode and append-mode.
@@ -361,12 +361,12 @@ abstract class ezcArchiveFile implements Iterator
     private static function getPureFileName( $fileName )
     {
         // TODO: Multistream goes wrong.
-        if ( strncmp( $fileName, "compress.zlib://", 16 ) == 0 )
+        if ( str_starts_with($fileName, "compress.zlib://") )
         {
             return substr( $fileName, 16 );
         }
 
-        if ( strncmp( $fileName, "compress.bzip2://", 17 ) == 0 )
+        if ( str_starts_with($fileName, "compress.bzip2://") )
         {
             return substr( $fileName, 17 );
         }

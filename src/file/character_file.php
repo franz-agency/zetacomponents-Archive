@@ -44,16 +44,14 @@ class ezcArchiveCharacterFile extends ezcArchiveFile
      *
      * @todo FIXME
      *
-     * @var string
      */
-    private $character;
+    private string|bool|null $character = null;
 
     /**
      * The current character position.
      *
-     * @var int
      */
-    private $position;
+    private int|float $position;
 
     /**
      * Sets the property $name to $value.
@@ -63,11 +61,10 @@ class ezcArchiveCharacterFile extends ezcArchiveFile
      *
      * @throws ezcBasePropertyNotFoundException if the property does not exist.
      * @param string $name
-     * @param mixed $value
      * @return void
      * @ignore
      */
-    public function __set( $name, $value )
+    public function __set( $name, mixed $value )
     {
         throw new ezcBasePropertyNotFoundException( $name );
     }

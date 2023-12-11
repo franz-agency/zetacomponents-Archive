@@ -25,7 +25,7 @@
  * @package Archive
  */
 
-return array(
+return [
     'ezcArchiveException'                 => 'Archive/exceptions/exception.php',
     'ezcArchiveBlockSizeException'        => 'Archive/exceptions/block_size.php',
     'ezcArchiveChecksumException'         => 'Archive/exceptions/checksum.php',
@@ -58,5 +58,5 @@ return array(
     'ezcArchivePaxTar'                    => 'Archive/tar/pax.php',
     'ezcArchiveStatMode'                  => 'Archive/utils/stat_mode.php',
     'ezcArchiveZip'                       => 'Archive/zip/zip.php',
-);
+];
 ?>

@@ -63,20 +63,12 @@
 class ezcArchiveBlockFile extends ezcArchiveFile
 {
     /**
-     * The block size.
-     *
-     * @var int
-     */
-    private $blockSize;
-
-    /**
      * The current number of the block.
      *
      * The first block starts with zero.
      *
-     * @var int
      */
-    private $blockNumber = -1;
+    private int $blockNumber = -1;
 
     /**
      * The current block data.
@@ -88,9 +80,8 @@ class ezcArchiveBlockFile extends ezcArchiveFile
     /**
      * Holds the last block number.
      *
-     * @var int
      */
-    private $lastBlock = -1;
+    private int $lastBlock = -1;
 
     /**
      * Sets the property $name to $value.
@@ -100,11 +91,10 @@ class ezcArchiveBlockFile extends ezcArchiveFile
      *
      * @throws ezcBasePropertyNotFoundException if the property does not exist.
      * @param string $name
-     * @param mixed $value
      * @return void
      * @ignore
      */
-    public function __set( $name, $value )
+    public function __set( $name, mixed $value )
     {
         throw new ezcBasePropertyNotFoundException( $name );
     }
@@ -119,15 +109,12 @@ class ezcArchiveBlockFile extends ezcArchiveFile
      * @return mixed
      * @ignore
      */
-    public function __get( $name )
+    public function __get($name)
     {
-        switch ( $name )
-        {
-            case "blockSize":
-                return $this->blockSize;
-        }
-
-        throw new ezcBasePropertyNotFoundException( $name );
+        return match ($name) {
+            "blockSize" => $this->blockSize,
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -146,10 +133,12 @@ class ezcArchiveBlockFile extends ezcArchiveFile
      * @param int $blockSize
      * @param bool $readOnly
      */
-    public function __construct( $fileName, $createIfNotExist = false, $blockSize = 512, $readOnly = false )
+    public function __construct( $fileName, $createIfNotExist = false, /**
+     * The block size.
+     *
+     */
+    private $blockSize = 512, $readOnly = false )
     {
-        $this->blockSize = $blockSize;
-
         $this->openFile( $fileName, $createIfNotExist, $readOnly );
     }
 

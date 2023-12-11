@@ -47,47 +47,47 @@
  * @package Archive
  * @version //autogentag//
  */
-class ezcArchiveEntry
+class ezcArchiveEntry implements \Stringable
 {
     /**
      * Is a regular file.
      */
-    const IS_FILE = 0;
+    final public const IS_FILE = 0;
 
     /**
      * Is a hard link.
      */
-    const IS_LINK = 1;
+    final public const IS_LINK = 1;
 
     /**
      * Is a symbolic link.
      */
-    const IS_SYMBOLIC_LINK = 2;
+    final public const IS_SYMBOLIC_LINK = 2;
 
     /**
      * Is a character device.
      */
-    const IS_CHARACTER_DEVICE = 3;
+    final public const IS_CHARACTER_DEVICE = 3;
 
     /**
      * Is a block device.
      */
-    const IS_BLOCK_DEVICE = 4;
+    final public const IS_BLOCK_DEVICE = 4;
 
     /**
      * Is a directory.
      */
-    const IS_DIRECTORY = 5;
+    final public const IS_DIRECTORY = 5;
 
     /**
      * Is a FIFO.
      */
-    const IS_FIFO = 6;
+    final public const IS_FIFO = 6;
 
     /**
      * Not used, is Tar specific?
      */
-    const IS_RESERVED = 7;
+    final public const IS_RESERVED = 7;
 
     /**
      * Contains the file information.
@@ -110,7 +110,6 @@ class ezcArchiveEntry
      * This class encapsulates the file information structure and provides convenient methods to retrieve
      * the information.
      *
-     * @param ezcArchiveFileStructure $struct
      */
     public function __construct( ezcArchiveFileStructure $struct )
     {
@@ -433,23 +432,13 @@ class ezcArchiveEntry
      */
     public function getTypeString()
     {
-        switch ( $this->fileStructure->type )
-        {
-            case self::IS_DIRECTORY:
-                return "d";
-
-            case self::IS_FILE:
-                return "-";
-
-            case self::IS_SYMBOLIC_LINK:
-                return "l";
-
-            case self::IS_LINK:
-                return "h";
-
-            default:
-                return "Z";
-        }
+        return match ($this->fileStructure->type) {
+            self::IS_DIRECTORY => "d",
+            self::IS_FILE => "-",
+            self::IS_SYMBOLIC_LINK => "l",
+            self::IS_LINK => "h",
+            default => "Z",
+        };
     }
 
     /**
@@ -477,7 +466,7 @@ class ezcArchiveEntry
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $out = $this->getTypeString();
         $out .= $this->getPermissionsString();
@@ -573,10 +562,10 @@ class ezcArchiveEntry
         if ( !is_array( $files ) )
         {
             $isArray = false;
-            $files = array( $files );
+            $files = [$files];
         }
 
-        $inodes = array();
+        $inodes = [];
         $i = 0;
         foreach ( $files as $file )
         {
@@ -628,32 +617,17 @@ class ezcArchiveEntry
      * @return int                    Possible values are: {@link IS_LINK}, {@link IS_SYMBOLIC_LINK}, {@link IS_CHARACTER_DEVICE},
      *                                 {@link IS_BLOCK_DEVICE}, {@link IS_DIRECTORY}, or {@link IS_FIFO}.
      */
-    protected static function getLinkType( $stat )
+    protected static function getLinkType($stat)
     {
-        switch ( $stat["mode"] & ezcArchiveStatMode::S_IFMT )
-        {
-            case ezcArchiveStatMode::S_IFIFO:
-                return ezcArchiveEntry::IS_FIFO;
-
-            case ezcArchiveStatMode::S_IFCHR:
-                return ezcArchiveEntry::IS_CHARACTER_DEVICE;
-
-            case ezcArchiveStatMode::S_IFDIR:
-                return ezcArchiveEntry::IS_DIRECTORY;
-
-            case ezcArchiveStatMode::S_IFBLK:
-                return ezcArchiveEntry::IS_BLOCK_DEVICE;
-
-            case ezcArchiveStatMode::S_IFREG:
-                return ezcArchiveEntry::IS_FILE;
-
-            case ezcArchiveStatMode::S_IFLNK:
-                return ezcArchiveEntry::IS_SYMBOLIC_LINK;
-
-            // Hardlinks are not resolved here. FIXME?
-        }
-
-        return false;
+        return match ($stat["mode"] & ezcArchiveStatMode::S_IFMT) {
+            ezcArchiveStatMode::S_IFIFO => ezcArchiveEntry::IS_FIFO,
+            ezcArchiveStatMode::S_IFCHR => ezcArchiveEntry::IS_CHARACTER_DEVICE,
+            ezcArchiveStatMode::S_IFDIR => ezcArchiveEntry::IS_DIRECTORY,
+            ezcArchiveStatMode::S_IFBLK => ezcArchiveEntry::IS_BLOCK_DEVICE,
+            ezcArchiveStatMode::S_IFREG => ezcArchiveEntry::IS_FILE,
+            ezcArchiveStatMode::S_IFLNK => ezcArchiveEntry::IS_SYMBOLIC_LINK,
+            default => false,
+        };
     }
 }
 ?>

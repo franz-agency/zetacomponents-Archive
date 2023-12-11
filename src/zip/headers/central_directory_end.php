@@ -75,14 +75,14 @@ class ezcArchiveCentralDirectoryEndHeader
     /**
      * Defines the signature of this header.
      */
-    const magic = 0x06054b50;
+    final public const magic = 0x06054b50;
 
     /**
      * Holds the properties of this class.
      *
      * @var array(string=>mixed)
      */
-    private $properties = array();
+    private array $properties = [];
 
     /**
      * Creates and initializes a new header.
@@ -91,7 +91,6 @@ class ezcArchiveCentralDirectoryEndHeader
      * When an ezcArchiveCharacterFile is given, the file position should be directly after the
      * signature of the header. This header will be read from the file and initialized in this class.
      *
-     * @param ezcArchiveCharacterFile $file
      */
     public function __construct( ezcArchiveCharacterFile $file = null )
     {
@@ -128,11 +127,10 @@ class ezcArchiveCentralDirectoryEndHeader
      * @throws ezcBasePropertyNotFoundException if the property does not exist.
      * @throws ezcBasePropertyReadOnlyException if the property is read-only
      * @param string $name
-     * @param mixed $value
      * @return void
      * @ignore
      */
-    public function __set( $name, $value )
+    public function __set( $name, mixed $value )
     {
         switch ( $name )
         {
@@ -172,21 +170,10 @@ class ezcArchiveCentralDirectoryEndHeader
      */
     public function __get( $name )
     {
-        switch ( $name )
-        {
-            case "diskNumber":
-            case "centralDirectoryDisk":
-            case "totalCentralDirectoryEntriesOnDisk":
-            case "totalCentralDirectoryEntries":
-            case "centralDirectorySize":
-            case "centralDirectoryStart":
-            case "commentLength":
-            case "comment":
-                return $this->properties[$name];
-
-            default:
-                throw new ezcBasePropertyNotFoundException( $name );
-        }
+        return match ($name) {
+            "diskNumber", "centralDirectoryDisk", "totalCentralDirectoryEntriesOnDisk", "totalCentralDirectoryEntries", "centralDirectorySize", "centralDirectoryStart", "commentLength", "comment" => $this->properties[$name],
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -243,7 +230,8 @@ class ezcArchiveCentralDirectoryEndHeader
      * Returns true if the given string $string matches with the current signature.
      *
      * @param string $string
-     * @return void
+     *
+     * @return bool
      */
     public static function isSignature( $string )
     {

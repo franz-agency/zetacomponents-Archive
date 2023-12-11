@@ -110,21 +110,12 @@ class ezcArchiveUstarHeader extends ezcArchiveV7Header
      * @return mixed
      * @ignore
      */
-    public function __get( $name )
+    public function __get($name)
     {
-        switch ( $name )
-        {
-            case "magic":
-            case "version":
-            case "userName":
-            case "groupName":
-            case "deviceMajorNumber":
-            case "deviceMinorNumber":
-            case "filePrefix":
-                return $this->properties[ $name ];
-        }
-
-        return parent::__get( $name );
+        return match ($name) {
+            "magic", "version", "userName", "groupName", "deviceMajorNumber", "deviceMinorNumber", "filePrefix" => $this->properties[ $name ],
+            default => parent::__get( $name ),
+        };
     }
 
     /**
@@ -224,46 +215,21 @@ class ezcArchiveUstarHeader extends ezcArchiveV7Header
         $this->modificationTime = $entry->getModificationTime();
         $this->linkName = $entry->getLink( false );
 
-        switch ( $entry->getType() )
-        {
-            case ezcArchiveEntry::IS_FILE:
-                $this->type = 0;
-                break;
-
-            case ezcArchiveEntry::IS_LINK:
-                $this->type = 1;
-                break;
-
-            case ezcArchiveEntry::IS_SYMBOLIC_LINK:
-                $this->type = 2;
-                break;
-
-            case ezcArchiveEntry::IS_CHARACTER_DEVICE:
-                $this->type = 3;
-                break;
-
-            case ezcArchiveEntry::IS_BLOCK_DEVICE:
-                $this->type = 4;
-                break;
-
-            case ezcArchiveEntry::IS_DIRECTORY:
-                $this->type = 5;
-                break;
-
-            case ezcArchiveEntry::IS_FIFO:
-                $this->type = 6;
-                break;
-
-            // Devices, etc are set to \0.
-            default:
-                $this->type = "";
-                break; // ends up as a \0 character.
-        }
+        $this->type = match ($entry->getType()) {
+            ezcArchiveEntry::IS_FILE => 0,
+            ezcArchiveEntry::IS_LINK => 1,
+            ezcArchiveEntry::IS_SYMBOLIC_LINK => 2,
+            ezcArchiveEntry::IS_CHARACTER_DEVICE => 3,
+            ezcArchiveEntry::IS_BLOCK_DEVICE => 4,
+            ezcArchiveEntry::IS_DIRECTORY => 5,
+            ezcArchiveEntry::IS_FIFO => 6,
+            default => "",
+        };
 
         $this->deviceMajorNumber = $entry->getMajor();
         $this->deviceMinorNumber = $entry->getMinor();
 
-        $length = strlen( $this->fileName );
+        $length = strlen( (string) $this->fileName );
 
         if ( $entry->getType() == ezcArchiveEntry::IS_DIRECTORY )
         {
@@ -277,7 +243,7 @@ class ezcArchiveUstarHeader extends ezcArchiveV7Header
         {
            if ( $this->fileName[ $length - 1] == "/" )
            {
-               $this->fileName = substr( $this->fileName, 0, -1 ); // Remove last character.
+               $this->fileName = substr( (string) $this->fileName, 0, -1 ); // Remove last character.
            }
         }
     }
@@ -354,7 +320,7 @@ class ezcArchiveUstarHeader extends ezcArchiveV7Header
 
         $enc = pack( "a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12",
             $this->fileName,
-            str_pad( $this->fileMode, 7, "0", STR_PAD_LEFT),
+            str_pad( (string) $this->fileMode, 7, "0", STR_PAD_LEFT),
             str_pad( decoct( $this->userId ), 7, "0", STR_PAD_LEFT),
             str_pad( decoct( $this->groupId ), 7, "0", STR_PAD_LEFT),
             str_pad( decoct( $this->fileSize ), 11, "0", STR_PAD_LEFT),

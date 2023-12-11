@@ -62,7 +62,7 @@ class ezcArchiveGnuHeader extends ezcArchiveUstarHeader
         {
             // FIXME  Assumed a while.. check the gnu tar source file.
             // FIXME  Check long links, really large files, etc.
-            $extensions = array();
+            $extensions = [];
 
             do
             {
@@ -106,7 +106,6 @@ class ezcArchiveGnuHeader extends ezcArchiveUstarHeader
      * Some filenames or link names do not fit in the Ustar header, and are therefor placed in a new block.
      * This method read the block(s) and returns the data as a string.
      *
-     * @param ezcArchiveBlockFile $file
      * @return string
      */
     protected function readExtension( ezcArchiveBlockFile $file )

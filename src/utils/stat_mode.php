@@ -50,51 +50,51 @@ class ezcArchiveStatMode
     /**
      * Type of the file.
      */
-    const S_IFMT = 0170000;
+    final public const S_IFMT = 0170000;
 
     /**
      * Named pipe (fifo).
      */
-    const S_IFIFO = 0010000;
+    final public const S_IFIFO = 0010000;
 
     /**
      * character special.
      */
-    const S_IFCHR = 0020000;
+    final public const S_IFCHR = 0020000;
 
     /**
      * Directory
      */
-    const S_IFDIR = 0040000;
+    final public const S_IFDIR = 0040000;
 
     /**
      * block special
      */
-    const S_IFBLK = 0060000;
+    final public const S_IFBLK = 0060000;
 
     /**
      * regular file
      */
-    const S_IFREG = 0100000;
+    final public const S_IFREG = 0100000;
 
     /**
      * Symbolic link
      */
-    const S_IFLNK = 0120000;
+    final public const S_IFLNK = 0120000;
 
     /**
      * Socket
      */
-    const S_IFSOCK = 0140000;
+    final public const S_IFSOCK = 0140000;
 
     /**
      * Whiteout
      */
-    const S_IFWHT = 0160000;
+    final public const S_IFWHT = 0160000;
 
     /**
      * Permission mask
      */
-    const S_PERM_MASK = 07777;
+    final public const S_PERM_MASK = 07777;
 }
 ?>

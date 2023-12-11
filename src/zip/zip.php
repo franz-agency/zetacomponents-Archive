@@ -94,7 +94,7 @@ class ezcArchiveZip extends ezcArchive implements Iterator
      */
     public function __construct( ezcArchiveCharacterFile $file )
     {
-        $this->localHeaderPositions = array();
+        $this->localHeaderPositions = [];
         $this->file = $file;
 
         $this->fileNumber = 0;
@@ -148,8 +148,8 @@ class ezcArchiveZip extends ezcArchive implements Iterator
      */
     protected function readCentralHeaders()
     {
-        $this->localHeaders = array();
-        $this->centralHeaders = array();
+        $this->localHeaders = [];
+        $this->centralHeaders = [];
 
         // read the central end headers
 
@@ -177,7 +177,7 @@ class ezcArchiveZip extends ezcArchive implements Iterator
             $this->file->seek( $startPosition );
             $data = $this->file->read( $filesize - $startPosition );
 
-            $pos = strpos( $data, $signatureString );
+            $pos = strpos( (string) $data, $signatureString );
 
             if ( $pos === false )
             {
@@ -377,7 +377,7 @@ class ezcArchiveZip extends ezcArchive implements Iterator
             }
         }
 
-        if ( strcmp( sprintf( "%u", crc32( $data ) ), sprintf( "%u", $header->crc & 0xffffffff ) ) == 0 )
+        if ( strcmp( sprintf( "%u", crc32( (string) $data ) ), sprintf( "%u", $header->crc & 0xffffffff ) ) == 0 )
         {
             $newFile = new ezcArchiveCharacterFile( $writeTo, true );
             $newFile->write( $data );
@@ -438,7 +438,7 @@ class ezcArchiveZip extends ezcArchive implements Iterator
 
         if ( !is_array( $files ) )
         {
-            $files = array( $files );
+            $files = [$files];
         }
 
         // Check whether the files are correct.
@@ -593,10 +593,10 @@ class ezcArchiveZip extends ezcArchive implements Iterator
             $this->file->truncate();
             $this->entriesRead = 0;
 
-            $this->localHeaders = array();
-            $this->localHeaderPositions = array();
-            $this->centralHeaders = array();
-            $this->centralHeaderPositions = array();
+            $this->localHeaders = [];
+            $this->localHeaderPositions = [];
+            $this->centralHeaders = [];
+            $this->centralHeaderPositions = [];
             $this->endRecord = null;
         }
         else

@@ -80,12 +80,11 @@ class ezcArchivePaxHeader extends ezcArchiveUstarHeader
      * This method reads an extended set of data from the ezcArchiveBlockFile
      * $file and returns the values in an array.
      *
-     * @param ezcArchiveBlockFile $file
      * @return array(string=>string)
      */
     protected function getPaxDecodedHeader( ezcArchiveBlockFile $file )
     {
-        $result = array();
+        $result = [];
 
         // next block has the info.
         $file->next();

@@ -159,120 +159,120 @@ class ezcArchiveLocalFileHeader
     /**
      * Defines the signature of this header.
      */
-    const magic = 0x04034b50;
+    public const magic = 0x04034b50;
 
     /**
      * Extra field definition.
      *
      * UNIX Extra Field ID ("UX").
      */
-    const EF_IZUNIX  = 0x5855;
+    public const EF_IZUNIX  = 0x5855;
 
     /**
      * Extra field definition.
      *
      * Info-ZIP's new Unix( "Ux" ).
      */
-    const EF_IZUNIX2 = 0x7855;
+    public const EF_IZUNIX2 = 0x7855;
 
     /**
      * Extra field definition.
      *
      * Universal timestamp( "UT" ).
      */
-    const EF_TIME    = 0x5455;
+    public const EF_TIME    = 0x5455;
 
     /**
      * Minimal UT field contains Flags byte
      */
-    const EB_UT_MINLEN = 1;
+    public const EB_UT_MINLEN = 1;
 
     /**
      * Byte offset of Flags field
      */
-    const EB_UT_FLAGS  = 0;
+    public const EB_UT_FLAGS  = 0;
 
     /**
      * Byte offset of 1st time value
      */
-    const EB_UT_TIME1  = 1;
+    public const EB_UT_TIME1  = 1;
 
     /**
      * mtime present
      */
-    const EB_UT_FL_MTIME = 1;
+    public const EB_UT_FL_MTIME = 1;
 
     /**
      * atime present
      */
-    const EB_UT_FL_ATIME = 2;
+    public const EB_UT_FL_ATIME = 2;
 
     /**
      * ctime present
      */
-    const EB_UT_FL_CTIME = 4;
+    public const EB_UT_FL_CTIME = 4;
 
     /**
      * UT field length.
      */
-    const EB_UT_FL_LEN = 4;
+    public const EB_UT_FL_LEN = 4;
 
     /**
      * Minimal "UX" field contains atime, mtime
      */
-    const EB_UX_MINLEN = 8;
+    public const EB_UX_MINLEN = 8;
 
     /**
      * Offset of atime in "UX" extra field data
      */
-    const EB_UX_ATIME  = 0;
+    public const EB_UX_ATIME  = 0;
 
     /**
      * Offset of mtime in "UX" extra field data
      */
-    const EB_UX_MTIME  = 4;
+    public const EB_UX_MTIME  = 4;
 
     /**
      * Full "UX" field ( atime, mtime, uid, gid )
      */
-    const EB_UX_FULLSIZE = 12;
+    public const EB_UX_FULLSIZE = 12;
 
     /**
      * Byte offset of UID in "UX" field data
      */
-    const EB_UX_UID = 8;
+    public const EB_UX_UID = 8;
 
     /**
      * Byte offset of GID in "UX" field data
      */
-    const EB_UX_GID = 10;
+    public const EB_UX_GID = 10;
 
     /**
      * Minimal Ux field contains UID/GID
      */
-    const EB_UX2_MINLEN = 4;
+    public const EB_UX2_MINLEN = 4;
 
     /**
      * Byte offset of UID in "Ux" field data
      */
-    const EB_UX2_UID = 0;
+    public const EB_UX2_UID = 0;
 
     /**
      * Byte offset of GID in "Ux" field data
      */
-    const EB_UX2_GID = 2;
+    public const EB_UX2_GID = 2;
 
     /**
      * Byte offset of valid in "Ux" field data
      */
-    const EB_UX2_VALID =  256;
+    public const EB_UX2_VALID =  256;
 
     /**
      * Holds the properties of this class.
      *
      * @var array(string=>mixed)
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Holds the user ID and is false if not set.
@@ -443,24 +443,10 @@ class ezcArchiveLocalFileHeader
      */
     public function __get( $name )
     {
-        switch ( $name )
-        {
-            case "version":
-            case "bitFlag":
-            case "compressionMethod":
-            case "lastModFileTime":
-            case "lastModFileDate":
-            case "crc":
-            case "compressedSize":
-            case "uncompressedSize":
-            case "extraFieldLength":
-            case "fileNameLength":
-            case "fileName":
-                return $this->properties[ $name ];
-
-            default:
-                throw new ezcBasePropertyNotFoundException( $name );
-        }
+        return match ($name) {
+            "version", "bitFlag", "compressionMethod", "lastModFileTime", "lastModFileDate", "crc", "compressedSize", "uncompressedSize", "extraFieldLength", "fileNameLength", "fileName" => $this->properties[ $name ],
+            default => throw new ezcBasePropertyNotFoundException( $name ),
+        };
     }
 
     /**
@@ -473,7 +459,7 @@ class ezcArchiveLocalFileHeader
      */
     public function getModificationTime()
     {
-        return ( $this->mtime ? $this->mtime : self::dosFormatToTimestamp( array( $this->lastModFileTime, $this->lastModFileDate ) ) );
+        return ( $this->mtime ?: self::dosFormatToTimestamp( [$this->lastModFileTime, $this->lastModFileDate] ) );
     }
 
     /**
@@ -487,7 +473,7 @@ class ezcArchiveLocalFileHeader
     public function setModificationTime( $timestamp )
     {
         $this->mtime = $timestamp;
-        list( $this->properties["lastModFileTime"], $this->properties["lastModFileDate"] ) = self::timestampToDosFormat( $timestamp );
+        [$this->properties["lastModFileTime"], $this->properties["lastModFileDate"]] = self::timestampToDosFormat( $timestamp );
     }
 
     /**
@@ -517,7 +503,7 @@ class ezcArchiveLocalFileHeader
         $dosDate <<= 5;
         $dosDate |= ( $time["mday"] & 31 ); // day.
 
-        return array( $dosTime, $dosDate );
+        return [$dosTime, $dosDate];
     }
 
     /**
@@ -641,7 +627,7 @@ class ezcArchiveLocalFileHeader
 
         if ( $entry->isSymLink() )
         {
-            $this->uncompressedSize = strlen( $entry->getLink() );
+            $this->uncompressedSize = strlen( (string) $entry->getLink() );
             $this->crc = ezcArchiveChecksums::getCrc32FromString( $entry->getLink() );
         }
         else
@@ -671,7 +657,7 @@ class ezcArchiveLocalFileHeader
      */
     protected function setExtraFieldData( $data )
     {
-        $raw = array();
+        $raw = [];
 
         $offset = 0;
         $dataLength = strlen( $data );
@@ -700,7 +686,7 @@ class ezcArchiveLocalFileHeader
             $offset += $dec["length"];
         }
 
-        $result = array();
+        $result = [];
 
         // The order is important.
         if ( isset( $raw["EF_TIME"]["mtime"] ) )
@@ -767,7 +753,7 @@ class ezcArchiveLocalFileHeader
             return unpack( "vuid/vgid", substr( $field, 0, self::EB_UX2_MINLEN ) );
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -788,7 +774,7 @@ class ezcArchiveLocalFileHeader
             return unpack( "Vatime/Vmtime", substr( $field, 0, self::EB_UX_MINLEN ) );
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -801,7 +787,7 @@ class ezcArchiveLocalFileHeader
     protected function getUniversalTimestampField( $field, $length )
     {
         $localOffset = 0;
-        $result = array();
+        $result = [];
 
         if ( $length >= self::EB_UT_MINLEN )
         {

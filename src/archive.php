@@ -73,47 +73,47 @@
  * @version //autogentag//
  * @mainclass
  */
-abstract class ezcArchive implements Iterator
+abstract class ezcArchive implements Iterator, \Stringable
 {
     /**
      * Normal tar archive.
      */
-    const TAR        = 0;
+    public const TAR        = 0;
 
     /**
      * Tar version 7 archive.
      */
-    const TAR_V7     = 1;
+    public const TAR_V7     = 1;
 
     /**
      * USTAR tar archive.
      */
-    const TAR_USTAR  = 2;
+    public const TAR_USTAR  = 2;
 
     /**
      * PAX tar archive.
      */
-    const TAR_PAX    = 3;
+    public const TAR_PAX    = 3;
 
     /**
      * GNU tar archive.
      */
-    const TAR_GNU    = 4;
+    public const TAR_GNU    = 4;
 
     /**
      * ZIP archive.
      */
-    const ZIP        = 10;
+    public const ZIP        = 10;
 
     /**
      * Gnu ZIP compression format.
      */
-    const GZIP       = 20;
+    public const GZIP       = 20;
 
     /**
      * BZIP2 compression format.
      */
-    const BZIP2      = 30;
+    public const BZIP2      = 30;
 
     /**
      * The entry or file number to which the iterator points.
@@ -190,7 +190,6 @@ abstract class ezcArchive implements Iterator
      *        {@link ezcArchive::TAR}, {@link ezcArchive::TAR_V7}, {@link ezcArchive::TAR_USTAR},
      *        {@link ezcArchive::TAR_PAX}, {@link ezcArchive::TAR_GNU}.
      *        TAR will use the TAR_USTAR algorithm by default.
-     * @param ezcArchiveOptions $options
      *
      * @return ezcArchive
      */
@@ -243,10 +242,9 @@ abstract class ezcArchive implements Iterator
      *
      * @throws ezcBasePropertyNotFoundException if the property does not exist.
      * @param string $name
-     * @param mixed $value
      * @ignore
      */
-    public function __set( $name, $value )
+    public function __set( $name, mixed $value )
     {
         throw new ezcBasePropertyNotFoundException( $name );
     }
@@ -334,7 +332,6 @@ abstract class ezcArchive implements Iterator
     /**
      * This method associates a new $options object with this archive.
      *
-     * @param ezcArchiveOptions $options
      */
     public function setOptions( ezcArchiveOptions $options )
     {
@@ -346,7 +343,6 @@ abstract class ezcArchive implements Iterator
      *
      * This method is made public for testing purposes, and should not be used.
      *
-     * @param ezcArchiveBlockFile $blockFile
      * @param int    $type
      *        The algorithm type. Possible values are:
      *        {@link ezcArchive::TAR}, {@link ezcArchive::TAR_V7}, {@link ezcArchive::TAR_USTAR},
@@ -358,27 +354,16 @@ abstract class ezcArchive implements Iterator
      *                     {@link ezcArchiveGnuTar}, or {@link ezcArchiveUstar}.
      * @access private
      */
-    public static function getTarInstance( ezcArchiveBlockFile $blockFile, $type )
+    public static function getTarInstance(ezcArchiveBlockFile $blockFile, $type)
     {
-        switch ( $type )
-        {
-            case self::TAR_V7:
-                return new ezcArchiveV7Tar( $blockFile );
-
-            case self::TAR_USTAR:
-                return new ezcArchiveUstarTar( $blockFile );
-
-            case self::TAR_PAX:
-                return new ezcArchivePaxTar( $blockFile );
-
-            case self::TAR_GNU:
-                return new ezcArchiveGnuTar( $blockFile );
-
-            case self::TAR:
-                return new ezcArchiveUstarTar( $blockFile ); // Default type.
-        }
-
-        return null;
+        return match ($type) {
+            self::TAR_V7 => new ezcArchiveV7Tar( $blockFile ),
+            self::TAR_USTAR => new ezcArchiveUstarTar( $blockFile ),
+            self::TAR_PAX => new ezcArchivePaxTar( $blockFile ),
+            self::TAR_GNU => new ezcArchiveGnuTar( $blockFile ),
+            self::TAR => new ezcArchiveUstarTar( $blockFile ),
+            default => null,
+        };
     }
 
     /**
@@ -498,7 +483,7 @@ abstract class ezcArchive implements Iterator
             return false;
         }
 
-        $isWindows = ( substr( php_uname( 's' ), 0, 7 ) == 'Windows' ) ? true : false;
+        $isWindows = ( str_starts_with(php_uname( 's' ), 'Windows') ) ? true : false;
         $entry = $this->current();
         $type = $entry->getType();
         $fileName = $target . DIRECTORY_SEPARATOR. $entry->getPath();
@@ -746,7 +731,7 @@ abstract class ezcArchive implements Iterator
         if ( !file_exists( $dirName ) )
         {
             // Try to create the directory.
-            if ( substr( php_uname( 's' ), 0, 7 ) == 'Windows' )
+            if ( str_starts_with(php_uname( 's' ), 'Windows') )
             {
                 // make all slashes to be '/'
                 $dirName = str_replace( '/', '\\', $dirName );
@@ -851,7 +836,7 @@ abstract class ezcArchive implements Iterator
             throw new ezcArchiveException( "The archive is closed" );
         }
 
-        $result = array();
+        $result = [];
         $this->rewind();
 
         do
@@ -870,7 +855,7 @@ abstract class ezcArchive implements Iterator
      *         if the archive is closed
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if ( $this->file === null )
         {
@@ -948,7 +933,7 @@ abstract class ezcArchive implements Iterator
     {
         if ( !is_array( $files ) )
         {
-            $files = array( $files );
+            $files = [$files];
         }
 
         // Check whether the files are correct.
